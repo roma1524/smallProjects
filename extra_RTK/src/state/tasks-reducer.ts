@@ -1,41 +1,30 @@
-import {TasksStateType} from '../App';
-import {AddTodolistActionType} from "./todolists-reducer";
+import {addTodolistAC} from "./todolists-reducer";
+import {createAction, createReducer, nanoid} from '@reduxjs/toolkit';
+import {TaskType} from '../Todolist';
 
-export type RemoveTaskActionType = ReturnType<typeof removeTaskAC>
-
-export type AddTaskActionType = ReturnType<typeof addTaskAC>
-
-export type ChangeTaskStatusActionType = ReturnType<typeof changeTaskStatusAC>
-
-export type ChangeTaskTitleActionType = ReturnType<typeof changeTaskTitleAC>
-
-type ActionsType = AddTodolistActionType
-    | RemoveTaskActionType
-    | AddTaskActionType
-    | ChangeTaskStatusActionType
-    | ChangeTaskTitleActionType
+export type TasksStateType = {
+    [key: string]: Array<TaskType>
+}
 
 const initialState: TasksStateType = {}
 
-export const tasksReducer = (state: TasksStateType = initialState, action: ActionsType): TasksStateType => {
-    switch (action.type) {
-        case 'ADD-TODOLIST': {
-            return {
-                ...state,
-                [action.todolistId]: []
-            }
-        }
-        default:
-            return state;
-    }
-}
+export const addTaskAC = createAction<{title: string, todolistId: string}>('tasks/addTask');
+
+export const tasksReducer = createReducer(initialState, (builder) => {
+    builder
+        .addCase(addTodolistAC, (state, action) => {
+            state[action.payload.id] = []
+        })
+        .addCase(addTaskAC, (state, action) => {
+            state[action.payload.todolistId].push({title: action.payload.title, id: nanoid(), isDone: false})
+        })
+})
+
 
 export const removeTaskAC = (taskId: string, todolistId: string) => {
     return {type: 'REMOVE-TASK', taskId: taskId, todolistId: todolistId} as const
 }
-export const addTaskAC = (title: string, todolistId: string) => {
-    return {type: 'ADD-TASK', title, todolistId} as const
-}
+
 export const changeTaskStatusAC = (taskId: string, isDone: boolean, todolistId: string) => {
     return {type: 'CHANGE-TASK-STATUS', isDone, todolistId, taskId} as const
 }

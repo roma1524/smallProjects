@@ -1,10 +1,15 @@
 import React, {ChangeEvent} from 'react';
 import {AddItemForm} from './AddItemForm';
 import {EditableSpan} from './EditableSpan';
-import {FilterValuesType} from "./App";
 import IconButton from '@mui/material/IconButton';
 import {Delete} from "@mui/icons-material";
 import {Button, Checkbox} from "@mui/material";
+import {changeTodolistTitleAC, FilterValuesType, removeTodolistAC} from './state/todolists-reducer';
+import {useAppSelector} from './common/hooks/useAppSelector';
+import {selectTodolists} from './state/todolists-selectors';
+import {selectTasks} from './state/tasks-selectors';
+import {useAppDispatch} from './common/hooks/useAppDispatch';
+import {addTaskAC} from './state/tasks-reducer';
 
 export type TaskType = {
     id: string
@@ -20,15 +25,21 @@ type PropsType = {
 }
 
 export function Todolist(props: PropsType) {
+
+    const todolists = useAppSelector(selectTodolists)
+    const tasks = useAppSelector(selectTasks)
+
+    const dispatch = useAppDispatch();
+
     const addTask = (title: string) => {
-        console.log('addTask')
+        dispatch(addTaskAC({title, todolistId: props.id}))
     }
 
     const removeTodolist = () => {
-        console.log('removeTodolist')
+        dispatch(removeTodolistAC({todolistId: props.id}))
     }
     const changeTodolistTitle = (title: string) => {
-        console.log('changeTodolistTitle')
+        dispatch(changeTodolistTitleAC({todolistId: props.id, title}))
     }
 
     const onAllClickHandler = () => alert('changeFilter all')
