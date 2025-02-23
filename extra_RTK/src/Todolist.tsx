@@ -11,7 +11,7 @@ import {
     removeTodolistAC
 } from './state/todolists-reducer';
 import {useAppDispatch} from './common/hooks/useAppDispatch';
-import {addTaskAC} from './state/tasks-reducer';
+import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from './state/tasks-reducer';
 
 export type TaskType = {
     id: string
@@ -33,14 +33,12 @@ export function Todolist(props: PropsType) {
     const addTask = (title: string) => {
         dispatch(addTaskAC({title, todolistId: props.id}))
     }
-
     const removeTodolist = () => {
         dispatch(removeTodolistAC({todolistId: props.id}))
     }
     const changeTodolistTitle = (title: string) => {
         dispatch(changeTodolistTitleAC({todolistId: props.id, title}))
     }
-
     const onAllClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'all'}))
     const onActiveClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'active'}))
     const onCompletedClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'completed'}))
@@ -55,15 +53,14 @@ export function Todolist(props: PropsType) {
         <div>
             {
                 props.tasks.map(t => {
-                    const onClickHandler = () => console.log('removeTask')
+                    const onClickHandler = () => dispatch(removeTaskAC({todolistId: props.id, taskId: t.id}))
                     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
                         let newIsDoneValue = e.currentTarget.checked;
-                        console.log('changeTaskStatus')
+                        dispatch(changeTaskStatusAC({todolistId: props.id, taskId: t.id, newIsDone: newIsDoneValue}))
                     }
                     const onTitleChangeHandler = (newValue: string) => {
-                        console.log('changeTaskTitle')
+                        dispatch(changeTaskTitleAC({todolistId: props.id, taskId: t.id, title: newValue}))
                     }
-
 
                     return <div key={t.id} className={t.isDone ? "is-done" : ""}>
                         <Checkbox
