@@ -14,6 +14,7 @@ export const addTodolistAC = createAction('todolists/addTodolist', (title: strin
 })
 export const removeTodolistAC = createAction<{todolistId: string}>('todolists/removeTodolist')
 export const changeTodolistTitleAC = createAction<{todolistId: string, title: string}>('todolists/changeTodolistTitle')
+export const changeTodolistFilteerAC = createAction<{todolistId: string, filer: FilterValuesType}>('todolists/changeTodolistFilteer')
 
 export const todolistsReducer = createReducer(initialState, (builder) => {
     builder
@@ -30,6 +31,12 @@ export const todolistsReducer = createReducer(initialState, (builder) => {
             const findEl = state.find(el => el.id === action.payload.todolistId)
             if (findEl) {
                 findEl.title = action.payload.title
+            }
+        })
+        .addCase(changeTodolistFilteerAC, (state, action) => {
+            const findEl = state.find(el => el.id === action.payload.todolistId)
+            if (findEl) {
+                findEl.filter = action.payload.filer
             }
         })
 })

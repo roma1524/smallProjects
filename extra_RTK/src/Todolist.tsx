@@ -4,10 +4,12 @@ import {EditableSpan} from './EditableSpan';
 import IconButton from '@mui/material/IconButton';
 import {Delete} from "@mui/icons-material";
 import {Button, Checkbox} from "@mui/material";
-import {changeTodolistTitleAC, FilterValuesType, removeTodolistAC} from './state/todolists-reducer';
-import {useAppSelector} from './common/hooks/useAppSelector';
-import {selectTodolists} from './state/todolists-selectors';
-import {selectTasks} from './state/tasks-selectors';
+import {
+    changeTodolistFilteerAC,
+    changeTodolistTitleAC,
+    FilterValuesType,
+    removeTodolistAC
+} from './state/todolists-reducer';
 import {useAppDispatch} from './common/hooks/useAppDispatch';
 import {addTaskAC} from './state/tasks-reducer';
 
@@ -26,9 +28,6 @@ type PropsType = {
 
 export function Todolist(props: PropsType) {
 
-    const todolists = useAppSelector(selectTodolists)
-    const tasks = useAppSelector(selectTasks)
-
     const dispatch = useAppDispatch();
 
     const addTask = (title: string) => {
@@ -42,9 +41,9 @@ export function Todolist(props: PropsType) {
         dispatch(changeTodolistTitleAC({todolistId: props.id, title}))
     }
 
-    const onAllClickHandler = () => alert('changeFilter all')
-    const onActiveClickHandler = () => alert('changeFilter active')
-    const onCompletedClickHandler = () => alert('changeFilter completed')
+    const onAllClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'all'}))
+    const onActiveClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'active'}))
+    const onCompletedClickHandler = () => dispatch(changeTodolistFilteerAC({todolistId: props.id, filer: 'completed'}))
 
     return <div>
         <h3> <EditableSpan value={props.title} onChange={changeTodolistTitle} />
