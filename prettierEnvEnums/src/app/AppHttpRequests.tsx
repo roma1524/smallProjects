@@ -3,13 +3,22 @@ import { todolistsApi } from "@/features/todolists/api/todolistsApi"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types"
 import { type ChangeEvent, type CSSProperties, useEffect, useState } from "react"
 import Checkbox from "@mui/material/Checkbox"
+import { taskstsApi } from "@/features/todolists/api/tasksApi.ts"
 
 export const AppHttpRequests = () => {
   const [todolists, setTodolists] = useState<Todolist[]>([])
   const [tasks, setTasks] = useState<any>({})
 
   useEffect(() => {
-    todolistsApi.getTodolists().then((res) => setTodolists(res.data))
+    todolistsApi.getTodolists().then((res) => {
+      const todolists = res.data
+      setTodolists(todolists)
+      todolists.forEach((t) => {
+        taskstsApi.getTasks(t.id).then((res) => {
+          console.log(res)
+        })
+      })
+    })
   }, [])
 
   const createTodolist = (title: string) => {
