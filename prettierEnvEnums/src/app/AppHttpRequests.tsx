@@ -3,19 +3,20 @@ import { todolistsApi } from "@/features/todolists/api/todolistsApi"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types"
 import { type ChangeEvent, type CSSProperties, useEffect, useState } from "react"
 import Checkbox from "@mui/material/Checkbox"
-import { taskstsApi } from "@/features/todolists/api/tasksApi.ts"
+import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
+import { Task } from "@/features/todolists/api/tasksApi.types.ts"
 
 export const AppHttpRequests = () => {
   const [todolists, setTodolists] = useState<Todolist[]>([])
-  const [tasks, setTasks] = useState<any>({})
+  const [tasks, setTasks] = useState<Record<string, Task[]>>({})
 
   useEffect(() => {
     todolistsApi.getTodolists().then((res) => {
       const todolists = res.data
       setTodolists(todolists)
       todolists.forEach((t) => {
-        taskstsApi.getTasks(t.id).then((res) => {
-          console.log(res)
+        tasksApi.getTasks(t.id).then((res) => {
+          setTasks({ ...tasks, [t.id]: res.data.items })
         })
       })
     })
@@ -38,9 +39,18 @@ export const AppHttpRequests = () => {
     })
   }
 
-  const createTask = (todolistId: string, title: string) => {}
+  const createTask = (todolistId: string, title: string) => {
+    tasksApi.сreateTask(todolistId, title).then((res) => {
+      const newTask = res.data.data.item
+      setTasks({ ...tasks, [todolistId]: [newTask, ...tasks[todolistId]] })
+    })
+  }
 
-  const deleteTask = (todolistId: string, taskId: string) => {}
+  const deleteTask = (todolistId: string, taskId: string) => {
+    tasksApi.deleteTask(todolistId, taskId).then(() => {
+      setTasks({ ...tasks, [todolistId]: [...tasks[todolistId].filter((t) => t.id !== taskId)] })
+    })
+  }
 
   const changeTaskStatus = (e: ChangeEvent<HTMLInputElement>, task: any) => {}
 
@@ -56,7 +66,7 @@ export const AppHttpRequests = () => {
             <button onClick={() => deleteTodolist(todolist.id)}>x</button>
           </div>
           <CreateItemForm onCreateItem={(title) => createTask(todolist.id, title)} />
-          {tasks[todolist.id]?.map((task: any) => (
+          {tasks[todolist.id]?.map((task) => (
             <div key={task.id}>
               <Checkbox checked={task.isDone} onChange={(e) => changeTaskStatus(e, task)} />
               <EditableSpan value={task.title} onChange={(title) => changeTaskTitle(task, title)} />
