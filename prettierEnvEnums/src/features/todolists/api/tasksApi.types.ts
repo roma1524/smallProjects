@@ -1,6 +1,6 @@
 import { TaskPriority, TaskStatus } from "@/common/enums/enums.ts"
 
-export type Task = {
+export interface Task {
   description: string | null
   title: string
   status: TaskStatus
@@ -22,8 +22,8 @@ export type GetTasksResponse = {
 export type UpdateTaskModel = {
   title: string
   description: string | null
-  status: number
-  priority: number
+  status: TaskStatus
+  priority: TaskPriority
   startDate: string | null
   deadline: string | null
 }
