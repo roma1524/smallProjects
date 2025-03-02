@@ -29,30 +29,25 @@ export const AppHttpRequests = () => {
       setTodolists([newTodolist, ...todolists])
     })
   }
-
   const deleteTodolist = (id: string) => {
     todolistsApi.deleteTodolist(id).then(() => setTodolists(todolists.filter((todolist) => todolist.id !== id)))
   }
-
   const changeTodolistTitle = (id: string, title: string) => {
     todolistsApi.changeTodolistTitle({ id, title }).then(() => {
       setTodolists(todolists.map((todolist) => (todolist.id === id ? { ...todolist, title } : todolist)))
     })
   }
-
   const createTask = (todolistId: string, title: string) => {
-    tasksApi.сreateTask(todolistId, title).then((res) => {
+    tasksApi.createTask(todolistId, title).then((res) => {
       const newTask = res.data.data.item
       setTasks({ ...tasks, [todolistId]: [newTask, ...tasks[todolistId]] })
     })
   }
-
   const deleteTask = (todolistId: string, taskId: string) => {
     tasksApi.deleteTask(todolistId, taskId).then(() => {
       setTasks({ ...tasks, [todolistId]: [...tasks[todolistId].filter((t) => t.id !== taskId)] })
     })
   }
-
   const changeTaskStatus = (e: ChangeEvent<HTMLInputElement>, task: Task) => {
     const model: UpdateTaskModel = {
       title: task.title,
@@ -64,15 +59,29 @@ export const AppHttpRequests = () => {
     }
 
     tasksApi.changeTaskStatus(task.todoListId, task.id, model).then((res) => {
-      console.log(res)
       setTasks({
         ...tasks,
         [task.todoListId]: tasks[task.todoListId].map((el) => (el.id === task.id ? res.data.data.item : el)),
       })
     })
   }
+  const changeTaskTitle = (task: Task, title: string) => {
+    const model: UpdateTaskModel = {
+      title: title,
+      deadline: task.deadline,
+      description: task.description,
+      priority: task.priority,
+      startDate: task.startDate,
+      status: task.status,
+    }
 
-  const changeTaskTitle = (task: any, title: string) => {}
+    tasksApi.changeTaskTitle(task.todoListId, task.id, model).then((res) => {
+      setTasks({
+        ...tasks,
+        [task.todoListId]: tasks[task.todoListId].map((el) => (el.id === task.id ? res.data.data.item : el)),
+      })
+    })
+  }
 
   return (
     <div style={{ margin: "20px" }}>
