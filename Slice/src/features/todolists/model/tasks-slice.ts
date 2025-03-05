@@ -36,9 +36,9 @@ export const tasksSlice = createSlice({
         task.title = action.payload.title
       }
     }),
-    // createTodolistAC: create.reducer<{todolistId: string}>((state, action) => {
-    //   state[action.payload.todolistId] = []
-    // }),
+    createTodolistAC: create.reducer<{todolistId: string}>((state, action) => {
+      state[action.payload.todolistId] = []
+    }),
 
   })
 })
