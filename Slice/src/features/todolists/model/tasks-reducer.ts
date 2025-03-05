@@ -1,49 +1,50 @@
-import { createAction, createReducer, nanoid } from "@reduxjs/toolkit"
-import { createTodolistAC, deleteTodolistAC } from "./todolists-reducer"
+import {createSlice, nanoid} from "@reduxjs/toolkit"
 
-export const deleteTaskAC = createAction<{ todolistId: string; taskId: string }>("tasks/deleteTask")
-export const createTaskAC = createAction<{ todolistId: string; title: string }>("tasks/createTask")
-export const changeTaskStatusAC = createAction<{ todolistId: string; taskId: string; isDone: boolean }>(
-  "tasks/changeTaskStatus",
-)
-export const changeTaskTitleAC = createAction<{ todolistId: string; taskId: string; title: string }>(
-  "tasks/changeTaskTitle",
-)
+//     .addCase(createTodolistAC, (state, action) => {
+//       state[action.payload.id] = []
+//     })
+//     .addCase(deleteTodolistAC, (state, action) => {
+//       delete state[action.payload.id]
+//     })
 
-const initialState: TasksState = {}
 
-export const tasksReducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(deleteTaskAC, (state, action) => {
-      const tasks = state[action.payload.todolistId]
+
+export const tasksSlice = createSlice({
+  name: "tasks",
+  initialState : {},
+  reducers: (create) => ({
+    deleteTaskAC: create.reducer<{ todolistId: string; taskId: string }>((state, action) => {
+      const tasks: Task[] = state[action.payload.todolistId]
       const index = tasks.findIndex((task) => task.id === action.payload.taskId)
       if (index !== -1) {
         tasks.splice(index, 1)
       }
-    })
-    .addCase(createTaskAC, (state, action) => {
+    }),
+    createTaskAC: create.reducer<{ todolistId: string; title: string }>((state, action) => {
       const newTask: Task = { title: action.payload.title, isDone: false, id: nanoid() }
       state[action.payload.todolistId].unshift(newTask)
-    })
-    .addCase(changeTaskStatusAC, (state, action) => {
+    }),
+    changeTaskStatusAC: create.reducer<{ todolistId: string; taskId: string; isDone: boolean }>((state, action) => {
       const task = state[action.payload.todolistId].find((task) => task.id === action.payload.taskId)
       if (task) {
         task.isDone = action.payload.isDone
       }
-    })
-    .addCase(changeTaskTitleAC, (state, action) => {
+    }),
+    changeTaskTitleAC: create.reducer<{ todolistId: string; taskId: string; title: string }>((state, action) => {
       const task = state[action.payload.todolistId].find((task) => task.id === action.payload.taskId)
       if (task) {
         task.title = action.payload.title
       }
-    })
-    .addCase(createTodolistAC, (state, action) => {
-      state[action.payload.id] = []
-    })
-    .addCase(deleteTodolistAC, (state, action) => {
-      delete state[action.payload.id]
-    })
+    }),
+    // createTodolistAC: create.reducer<{todolistId: string}>((state, action) => {
+    //   state[action.payload.todolistId] = []
+    // }),
+
+  })
 })
+
+export const tasksReducer = tasksSlice.reducer
+export const {deleteTaskAC, createTaskAC, changeTaskStatusAC, changeTaskTitleAC} = tasksSlice.actions
 
 export type Task = {
   id: string
