@@ -1,4 +1,5 @@
-import type { TaskPriority, TaskStatus } from "@/common/enums/enums"
+import type {TaskPriority, TaskStatus} from "@/common/enums/enums"
+import {FilterValues, Todolist} from "@/features/todolists/model/todolists-slice.ts";
 
 export type DomainTask = {
   description: string
@@ -26,4 +27,8 @@ export type UpdateTaskModel = {
   priority: TaskPriority
   startDate: string
   deadline: string
+}
+
+export type DomainTodolist = Todolist & {
+  filter: FilterValues
 }
