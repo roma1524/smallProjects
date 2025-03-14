@@ -42,10 +42,10 @@ export const tasksSlice = createAppSlice({
             }
             state[action.payload.todolistId].unshift(newTask)
         }),
-        changeTaskStatusAC: create.reducer<{ todolistId: string; taskId: string; isDone: boolean }>((state, action) => {
+        changeTaskStatusAC: create.reducer<{ todolistId: string; taskId: string; status: TaskStatus }>((state, action) => {
             const task = state[action.payload.todolistId].find((task) => task.id === action.payload.taskId)
             if (task) {
-                task.status = action.payload.isDone ? TaskStatus.Completed : TaskStatus.New
+                task.status = action.payload.status
             }
         }),
         changeTaskTitleAC: create.reducer<{ todolistId: string; taskId: string; title: string }>((state, action) => {
