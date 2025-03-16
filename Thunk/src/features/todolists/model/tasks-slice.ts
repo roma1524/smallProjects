@@ -68,12 +68,22 @@ export const tasksSlice = createAppSlice({
             fulfilled: (state, action) => {
                 state[action.payload.todolisrId] = action.payload.tasks
             }
-        })
+        }),
+        createTask: create.asyncThunk(async (args: { todolistId: string, title: string }, {rejectWithValue}) => {
+            try {
+                const res = await tasksApi.createTask(args)
+                return {task: res.data.data.item}
+            } catch (error) {
+                return rejectWithValue(error)
+            }
+        }, {fulfilled: (state, action) => {
+                state[action.payload.task.todoListId].unshift(action.payload.task)
+            }})
     }),
 })
 
 export const {selectTasks} = tasksSlice.selectors
-export const {deleteTaskAC, createTaskAC, changeTaskStatusAC, changeTaskTitleAC, fetchTasks} = tasksSlice.actions
+export const {deleteTaskAC, createTaskAC, changeTaskStatusAC, changeTaskTitleAC, fetchTasks, createTask} = tasksSlice.actions
 export const tasksReducer = tasksSlice.reducer
 
 export type TasksState = Record<string, DomainTask[]>
