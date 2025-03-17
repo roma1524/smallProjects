@@ -5,7 +5,7 @@ import {
   DomainTask,
   UpdateTaskModel,
 } from "@/features/todolists/api/tasksApi.types.ts";
-import { TaskStatus } from "@/common/enums";
+import { setStatus } from "@/app/app-slice.ts";
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -23,18 +23,6 @@ export const tasksSlice = createAppSlice({
       });
   },
   reducers: (create) => ({
-    changeTaskStatusAC: create.reducer<{
-      todolistId: string;
-      taskId: string;
-      status: TaskStatus;
-    }>((state, action) => {
-      const task = state[action.payload.todolistId].find(
-        (task) => task.id === action.payload.taskId,
-      );
-      if (task) {
-        task.status = action.payload.status;
-      }
-    }),
     changeTaskTitleAC: create.reducer<{
       todolistId: string;
       taskId: string;
@@ -51,11 +39,15 @@ export const tasksSlice = createAppSlice({
     // --------------  Thunk  --------------
 
     fetchTasks: create.asyncThunk(
-      async (todolisrId: string, { rejectWithValue }) => {
+      async (todolisrId: string, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setStatus({ status: "loading" }));
+
           const res = await tasksApi.getTasks(todolisrId);
+          dispatch(setStatus({ status: "succeeded" }));
           return { tasks: res.data.items, todolisrId };
         } catch (e) {
+          dispatch(setStatus({ status: "failed" }));
           return rejectWithValue(null);
         }
       },
