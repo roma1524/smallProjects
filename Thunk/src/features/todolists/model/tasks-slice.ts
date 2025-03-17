@@ -44,11 +44,11 @@ export const tasksSlice = createAppSlice({
           dispatch(setStatus({ status: "loading" }));
 
           const res = await tasksApi.getTasks(todolisrId);
-          dispatch(setStatus({ status: "succeeded" }));
           return { tasks: res.data.items, todolisrId };
         } catch (e) {
-          dispatch(setStatus({ status: "failed" }));
           return rejectWithValue(null);
+        } finally {
+          dispatch(setStatus({ status: "idle" }));
         }
       },
       {
@@ -63,6 +63,10 @@ export const tasksSlice = createAppSlice({
         { rejectWithValue },
       ) => {
         try {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 1000);
+          });
+
           const res = await tasksApi.createTask(args);
           return { task: res.data.data.item };
         } catch (error) {

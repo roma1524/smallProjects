@@ -49,15 +49,15 @@ export const todolistsSlice = createAppSlice({
         try {
           dispatch(setStatus({ status: "loading" }));
           await new Promise((res) => {
-            setTimeout(res, 2000);
+            setTimeout(res, 1000);
           });
 
           const res = await todolistsApi.getTodolists();
-          dispatch(setStatus({ status: "succeeded" }));
           return { todolists: res.data };
         } catch (error) {
-          dispatch(setStatus({ status: "failed" }));
           return rejectWithValue(null);
+        } finally {
+          dispatch(setStatus({ status: "idle" }));
         }
       },
       {
