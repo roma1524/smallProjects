@@ -1,9 +1,11 @@
 import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
 import { createAppSlice } from "@/common/utils";
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts";
-import { DomainTask } from "@/features/todolists/api/tasksApi.types.ts";
-import { TaskPriority, TaskStatus } from "@/common/enums";
-import { nanoid } from "@reduxjs/toolkit";
+import {
+  DomainTask,
+  UpdateTaskModel,
+} from "@/features/todolists/api/tasksApi.types.ts";
+import { TaskStatus } from "@/common/enums";
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -105,16 +107,48 @@ export const tasksSlice = createAppSlice({
         },
       },
     ),
+    changeTaskStatus: create.asyncThunk(
+      async (task: DomainTask, { rejectWithValue }) => {
+        try {
+          const model: UpdateTaskModel = {
+            description: task.description,
+            title: task.title,
+            status: task.status,
+            priority: task.priority,
+            startDate: task.startDate,
+            deadline: task.deadline,
+          };
+          await tasksApi.updateTask({
+            todolistId: task.todoListId,
+            taskId: task.id,
+            model,
+          });
+          return task;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          const task = state[action.payload.todoListId].find(
+            (el) => el.id === action.payload.id,
+          );
+          if (task) {
+            task.status = action.payload.status;
+          }
+        },
+      },
+    ),
   }),
 });
 
 export const { selectTasks } = tasksSlice.selectors;
 export const {
-  changeTaskStatusAC,
   changeTaskTitleAC,
   fetchTasks,
   createTask,
   deleteTask,
+  changeTaskStatus,
 } = tasksSlice.actions;
 export const tasksReducer = tasksSlice.reducer;
 

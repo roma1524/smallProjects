@@ -1,7 +1,7 @@
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan";
 import { useAppDispatch } from "@/common/hooks";
 import {
-  changeTaskStatusAC,
+  changeTaskStatus,
   changeTaskTitleAC,
   deleteTask,
 } from "@/features/todolists/model/tasks-slice";
@@ -26,15 +26,11 @@ export const TaskItem = ({ task, todolistId }: Props) => {
     dispatch(deleteTask({ todolistId, taskId: task.id }));
   };
 
-  const changeTaskStatus = (e: ChangeEvent<HTMLInputElement>) => {
-    const newStatusValue = e.currentTarget.checked;
-    dispatch(
-      changeTaskStatusAC({
-        todolistId,
-        taskId: task.id,
-        status: newStatusValue ? TaskStatus.Completed : TaskStatus.New,
-      }),
-    );
+  const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const newStatusValue = e.currentTarget.checked
+      ? TaskStatus.Completed
+      : TaskStatus.New;
+    dispatch(changeTaskStatus({ ...task, status: newStatusValue }));
   };
 
   const changeTaskTitle = (title: string) => {
@@ -46,7 +42,7 @@ export const TaskItem = ({ task, todolistId }: Props) => {
       <div>
         <Checkbox
           checked={task.status === TaskStatus.Completed}
-          onChange={changeTaskStatus}
+          onChange={changeTaskStatusHandler}
         />
         <EditableSpan value={task.title} onChange={changeTaskTitle} />
       </div>
