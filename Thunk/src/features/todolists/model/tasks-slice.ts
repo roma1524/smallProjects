@@ -1,4 +1,4 @@
-import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
+import { createTodolist, deleteTodolistTC } from "./todolists-slice";
 import { createAppSlice } from "@/common/utils";
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts";
 import {
@@ -15,7 +15,7 @@ export const tasksSlice = createAppSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createTodolistTC.fulfilled, (state, action) => {
+      .addCase(createTodolist.fulfilled, (state, action) => {
         state[action.payload.todolist.id] = [];
       })
       .addCase(deleteTodolistTC.fulfilled, (state, action) => {
@@ -23,21 +23,6 @@ export const tasksSlice = createAppSlice({
       });
   },
   reducers: (create) => ({
-    // changeTaskTitleAC: create.reducer<{
-    //   todolistId: string;
-    //   taskId: string;
-    //   title: string;
-    // }>((state, action) => {
-    //   const task = state[action.payload.todolistId].find(
-    //     (task) => task.id === action.payload.taskId,
-    //   );
-    //   if (task) {
-    //     task.title = action.payload.title;
-    //   }
-    // }),
-
-    // --------------  Thunk  --------------
-
     fetchTasks: create.asyncThunk(
       async (todolisrId: string, { dispatch, rejectWithValue }) => {
         try {

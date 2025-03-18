@@ -12,9 +12,9 @@ export const todolistsSlice = createAppSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createTodolistTC.fulfilled, (state, action) => {
-        state.unshift({ ...action.payload.todolist, filter: "all" });
-      })
+      // .addCase(createTodolistTC.fulfilled, (state, action) => {
+      //   state.unshift({ ...action.payload.todolist, filter: "all" });
+      // })
       .addCase(deleteTodolistTC.fulfilled, (state, action) => {
         const index = state.findIndex(
           (todolist) => todolist.id === action.payload.id,
@@ -68,20 +68,36 @@ export const todolistsSlice = createAppSlice({
         },
       },
     ),
+    createTodolist: create.asyncThunk(
+      async (title: string, { rejectWithValue }) => {
+        try {
+          const res = await todolistsApi.createTodolist(title);
+          console.log(res);
+          return { todolist: res.data.data.item };
+        } catch (error) {
+          return rejectWithValue(null);
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          state.unshift({ ...action.payload.todolist, filter: "all" });
+        },
+      },
+    ),
   }),
 });
 
-export const createTodolistTC = createAsyncThunk(
-  `${todolistsSlice.name}/createTodolistTC`,
-  async (title: string, thunkAPI) => {
-    try {
-      const res = await todolistsApi.createTodolist(title);
-      return { todolist: res.data.data.item };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(null);
-    }
-  },
-);
+// export const createTodolistTC = createAsyncThunk(
+//   `${todolistsSlice.name}/createTodolistTC`,
+//   async (title: string, thunkAPI) => {
+//     try {
+//       const res = await todolistsApi.createTodolist(title);
+//       return { todolist: res.data.data.item };
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(null);
+//     }
+//   },
+// );
 
 export const deleteTodolistTC = createAsyncThunk(
   `${todolistsSlice.name}/deleteTodolistTC`,
@@ -108,7 +124,7 @@ export const changeTodolistTitleTC = createAsyncThunk(
 );
 
 export const { selectTodolists } = todolistsSlice.selectors;
-export const { changeTodolistFilterAC, fetchTodolists } =
+export const { changeTodolistFilterAC, fetchTodolists, createTodolist } =
   todolistsSlice.actions;
 export const todolistsReducer = todolistsSlice.reducer;
 
