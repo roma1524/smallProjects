@@ -23,18 +23,18 @@ export const tasksSlice = createAppSlice({
       });
   },
   reducers: (create) => ({
-    changeTaskTitleAC: create.reducer<{
-      todolistId: string;
-      taskId: string;
-      title: string;
-    }>((state, action) => {
-      const task = state[action.payload.todolistId].find(
-        (task) => task.id === action.payload.taskId,
-      );
-      if (task) {
-        task.title = action.payload.title;
-      }
-    }),
+    // changeTaskTitleAC: create.reducer<{
+    //   todolistId: string;
+    //   taskId: string;
+    //   title: string;
+    // }>((state, action) => {
+    //   const task = state[action.payload.todolistId].find(
+    //     (task) => task.id === action.payload.taskId,
+    //   );
+    //   if (task) {
+    //     task.title = action.payload.title;
+    //   }
+    // }),
 
     // --------------  Thunk  --------------
 
@@ -135,12 +135,44 @@ export const tasksSlice = createAppSlice({
         },
       },
     ),
+    changeTaskTitle: create.asyncThunk(
+      async (task: DomainTask, { rejectWithValue }) => {
+        try {
+          const model: UpdateTaskModel = {
+            description: task.description,
+            title: task.title,
+            status: task.status,
+            priority: task.priority,
+            startDate: task.startDate,
+            deadline: task.deadline,
+          };
+          await tasksApi.updateTask({
+            todolistId: task.todoListId,
+            taskId: task.id,
+            model,
+          });
+          return task;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          const task = state[action.payload.todoListId].find(
+            (task) => task.id === action.payload.id,
+          );
+          if (task) {
+            task.title = action.payload.title;
+          }
+        },
+      },
+    ),
   }),
 });
 
 export const { selectTasks } = tasksSlice.selectors;
 export const {
-  changeTaskTitleAC,
+  changeTaskTitle,
   fetchTasks,
   createTask,
   deleteTask,
