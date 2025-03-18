@@ -1,4 +1,4 @@
-import { createTodolist, deleteTodolistTC } from "./todolists-slice";
+import { createTodolist, deleteTodolist } from "./todolists-slice";
 import { createAppSlice } from "@/common/utils";
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts";
 import {
@@ -18,7 +18,7 @@ export const tasksSlice = createAppSlice({
       .addCase(createTodolist.fulfilled, (state, action) => {
         state[action.payload.todolist.id] = [];
       })
-      .addCase(deleteTodolistTC.fulfilled, (state, action) => {
+      .addCase(deleteTodolist.fulfilled, (state, action) => {
         delete state[action.payload.id];
       });
   },
@@ -45,14 +45,16 @@ export const tasksSlice = createAppSlice({
     createTask: create.asyncThunk(
       async (
         args: { todolistId: string; title: string },
-        { rejectWithValue },
+        { dispatch, rejectWithValue },
       ) => {
         try {
+          dispatch(setStatus({ status: "loading" }));
           await new Promise((resolve) => {
             setTimeout(resolve, 1000);
           });
 
           const res = await tasksApi.createTask(args);
+          dispatch(setStatus({ status: "succeeded" }));
           return { task: res.data.data.item };
         } catch (error) {
           return rejectWithValue(error);
