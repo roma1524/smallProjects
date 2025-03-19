@@ -4,6 +4,7 @@ import { createTodolistTC } from "@/features/todolists/model/todolists-slice"
 import { Todolists } from "@/features/todolists/ui/Todolists/Todolists"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid2"
+import { ErrorSnackbar } from "@/common/components/ErrorSnackbar/ErrorSnackbar.tsx"
 
 export const Main = () => {
   const dispatch = useAppDispatch()
@@ -20,6 +21,7 @@ export const Main = () => {
       <Grid container spacing={4}>
         <Todolists />
       </Grid>
+      <ErrorSnackbar/>
     </Container>
   )
 }
