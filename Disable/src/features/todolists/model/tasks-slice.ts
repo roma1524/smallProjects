@@ -1,9 +1,10 @@
-import { setAppStatusAC } from "@/app/app-slice"
+import { selectAppErrorAC, setAppStatusAC } from "@/app/app-slice"
 import type { RootState } from "@/app/store"
 import { createAppSlice } from "@/common/utils"
 import { tasksApi } from "@/features/todolists/api/tasksApi"
 import type { DomainTask, UpdateTaskModel } from "@/features/todolists/api/tasksApi.types"
 import { createTodolistTC, deleteTodolistTC } from "./todolists-slice"
+import { ResultCode } from "@/common/enums"
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -44,8 +45,16 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setAppStatusAC({ status: "loading" }))
           const res = await tasksApi.createTask(payload)
-          dispatch(setAppStatusAC({ status: "succeeded" }))
-          return { task: res.data.data.item }
+
+          if(res.data.resultCode === ResultCode.Success) {
+            dispatch(setAppStatusAC({ status: "succeeded" }))
+            return { task: res.data.data.item }
+          } else {
+            dispatch(setAppStatusAC({ status: "failed" }))
+            dispatch(selectAppErrorAC({error: res.data.messages[0]}))
+            return rejectWithValue(null)
+          }
+
         } catch (error) {
           dispatch(setAppStatusAC({ status: "failed" }))
           return rejectWithValue(null)
