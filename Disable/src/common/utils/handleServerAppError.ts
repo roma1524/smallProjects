@@ -1,12 +1,18 @@
 import { setAppErrorAC, setAppStatusAC } from "@/app/app-slice"
-import type { BaseResponse } from "@/common/types"
 import type { Dispatch } from "@reduxjs/toolkit"
+import axios from "axios"
 
-export const handleServerAppError = <T>(data: BaseResponse<T>, dispatch: Dispatch) => {
-  if (data.messages.length) {
-    dispatch(setAppErrorAC({ error: data.messages[0] }))
+export const handleServerAppError = (error: unknown, dispatch: Dispatch) => {
+  let errorMessage
+
+  if (axios.isAxiosError(error)) {
+    errorMessage = JSON.stringify(error)
+  } else if (error instanceof Error) {
+    errorMessage = error.message
   } else {
-    dispatch(setAppErrorAC({ error: "Some error occurred" }))
+    errorMessage = JSON.stringify(error)
   }
+
+  dispatch(setAppErrorAC({ error: "Some error occurred" }))
   dispatch(setAppStatusAC({ status: "failed" }))
 }

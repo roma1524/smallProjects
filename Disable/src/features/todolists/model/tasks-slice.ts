@@ -46,17 +46,16 @@ export const tasksSlice = createAppSlice({
           dispatch(setAppStatusAC({ status: "loading" }))
           const res = await tasksApi.createTask(payload)
 
-          if(res.data.resultCode === ResultCode.Success) {
+          if (res.data.resultCode === ResultCode.Success) {
             dispatch(setAppStatusAC({ status: "succeeded" }))
             return { task: res.data.data.item }
           } else {
             dispatch(setAppStatusAC({ status: "failed" }))
-            dispatch(setAppErrorAC({error: res.data.messages[0]}))
+            dispatch(setAppErrorAC({ error: res.data.messages[0] }))
             return rejectWithValue(null)
           }
-
-        } catch (error: any) {
-          handleServerNetworkError(dispatch, error);
+        } catch (error) {
+          handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
       },

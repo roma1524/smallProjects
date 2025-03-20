@@ -47,7 +47,7 @@ export const todolistsSlice = createAppSlice({
             dispatch(setAppErrorAC({ error }))
             return rejectWithValue(null)
           }
-        } catch (error: any) {
+        } catch (error) {
           dispatch(setAppErrorAC({ error: error.message }))
           dispatch(setAppStatusAC({ status: "failed" }))
           return rejectWithValue(null)
