@@ -1,5 +1,7 @@
 import TextField from "@mui/material/TextField"
 import { type ChangeEvent, useState } from "react"
+import { useAppSelector } from "@/common/hooks"
+import { selectAppStatus } from "@/app/app-slice.ts"
 
 type Props = {
   value: string
@@ -9,6 +11,8 @@ type Props = {
 export const EditableSpan = ({ value, onChange }: Props) => {
   const [title, setTitle] = useState(value)
   const [isEditMode, setIsEditMode] = useState(false)
+
+  const status = useAppSelector(selectAppStatus)
 
   const turnOnEditMode = () => {
     setIsEditMode(true)
@@ -25,7 +29,7 @@ export const EditableSpan = ({ value, onChange }: Props) => {
 
   return (
     <>
-      {isEditMode ? (
+      {status !== "loading" && isEditMode ? (
         <TextField
           variant={"outlined"}
           value={title}

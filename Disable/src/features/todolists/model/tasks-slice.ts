@@ -68,12 +68,20 @@ export const tasksSlice = createAppSlice({
     deleteTaskTC: create.asyncThunk(
       async (payload: { todolistId: string; taskId: string }, { dispatch, rejectWithValue }) => {
         try {
+          await new Promise((resolve) => setTimeout(resolve, 3000))
           dispatch(setAppStatusAC({ status: "loading" }))
-          await tasksApi.deleteTask(payload)
-          dispatch(setAppStatusAC({ status: "succeeded" }))
-          return payload
+          const res = await tasksApi.deleteTask(payload)
+
+          if (res.data.resultCode === ResultCode.Success) {
+            dispatch(setAppStatusAC({ status: "succeeded" }))
+            return payload
+          } else {
+            dispatch(setAppStatusAC({ status: "failed" }))
+            dispatch(setAppErrorAC({ error: res.data.messages[0] }))
+            return rejectWithValue(null)
+          }
         } catch (error) {
-          dispatch(setAppStatusAC({ status: "failed" }))
+          handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
       },
@@ -114,10 +122,17 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setAppStatusAC({ status: "loading" }))
           const res = await tasksApi.updateTask({ todolistId, taskId, model })
-          dispatch(setAppStatusAC({ status: "succeeded" }))
-          return { task: res.data.data.item }
+
+          if (res.data.resultCode === ResultCode.Success) {
+            dispatch(setAppStatusAC({ status: "succeeded" }))
+            return { task: res.data.data.item }
+          } else {
+            dispatch(setAppStatusAC({ status: "failed" }))
+            dispatch(setAppErrorAC({ error: res.data.messages[0] }))
+            return rejectWithValue(null)
+          }
         } catch (error) {
-          dispatch(setAppStatusAC({ status: "failed" }))
+          handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
       },
