@@ -11,12 +11,9 @@ import Grid from "@mui/material/Grid2"
 import TextField from "@mui/material/TextField"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import s from "./Login.module.css"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Inputs, loginSchema } from "@/features/auth/lib/schemas"
 
-type Inputs = {
-  email: string
-  password: string
-  rememberMe: boolean
-}
 
 export const Login = () => {
   const {
@@ -25,7 +22,7 @@ export const Login = () => {
     reset,
     control,
     formState: { errors },
-  } = useForm<Inputs>({ defaultValues: { email: "", password: "", rememberMe: false } })
+  } = useForm<Inputs>({resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "", rememberMe: false } })
 
   const themeMode = useAppSelector(selectThemeMode)
 
@@ -65,16 +62,11 @@ export const Login = () => {
               label="Email"
               margin="normal"
               error={!!errors.email}
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                  message: "Incorrect email address",
-                },
-              })}
+              {...register("email")}
             />
             {errors.email && <span className={s.errorMessage}>{errors.email.message}</span>}
             <TextField type="password" label="Password" margin="normal" {...register("password")} />
+            {errors.password && <span className={s.errorMessage}>{errors.password?.message}</span>}
             <FormControlLabel
               label="Remember me"
               control={
