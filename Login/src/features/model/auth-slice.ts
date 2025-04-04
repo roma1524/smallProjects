@@ -4,14 +4,18 @@ import { authApi } from "@/features/auth/api/authApi.ts"
 import { ResultCode } from "@/common/enums"
 import { LoginArgs } from "@/features/auth/api/authApi.types.ts"
 import { AUTH_TOKEN } from "@/common/constants"
+import { clearDataAC } from "@/common/actions"
+
 
 export const authSlice = createAppSlice({
   name: "auth",
   initialState: {
     isLoggedIn: false,
+    isInitialized: false,
   },
   selectors: {
     selectIsLoggedIn: (state) => state.isLoggedIn,
+    selectIsInitialized: (state) => state.isInitialized,
   },
   reducers: (create) => ({
     loginTC: create.asyncThunk(
@@ -50,6 +54,7 @@ export const authSlice = createAppSlice({
           if (res.data.resultCode === ResultCode.Success) {
             dispatch(setAppStatusAC({ status: "succeeded" }))
             localStorage.removeItem(AUTH_TOKEN)
+            dispatch(clearDataAC())
             return { isLoggedIn: false }
           } else {
             handleServerAppError(res.data, dispatch)
@@ -87,11 +92,20 @@ export const authSlice = createAppSlice({
         fulfilled: (state, action) => {
           state.isLoggedIn = action.payload.isLoggedIn
         },
+        settled: (state) => {
+          state.isInitialized = true
+        }
       },
     ),
   }),
+  // extraReducers: (builder) => {
+  //   builder.addCase(clearDataAC, (state) => {
+  //     debugger
+  //    return state.isLoggedIn = false
+  //   })
+  // }
 })
 
-export const { selectIsLoggedIn } = authSlice.selectors
+export const { selectIsLoggedIn, selectIsInitialized } = authSlice.selectors
 export const { loginTC, logoutTC, initializeAppTC } = authSlice.actions
 export const authReducer = authSlice.reducer
