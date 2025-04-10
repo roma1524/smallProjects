@@ -1,7 +1,7 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "./todolistsApi.types"
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { BaseQueryArg, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { AUTH_TOKEN } from "@/common/constants"
 import { DomainTask } from "@/features/todolists/api/tasksApi.types.ts"
 
@@ -23,23 +23,32 @@ export const todolistsApi = createApi({
         })
       },
     }),
+    createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
+      query: (title) => {
+        return {
+          method: "POST",
+          url: "/todo-lists",
+          body: { title },
+        }
+      },
+    }),
   }),
 })
 
-export const { useGetTodolistsQuery } = todolistsApi
+export const { useGetTodolistsQuery, useCreateTodolistMutation } = todolistsApi
 
 export const _todolistsApi = {
   getTodolists() {
     return instance.get<Todolist[]>("/todo-lists")
-  },
-  changeTodolistTitle(payload: { id: string; title: string }) {
-    const { id, title } = payload
-    return instance.put<BaseResponse>(`/todo-lists/${id}`, { title })
   },
   createTodolist(title: string) {
     return instance.post<BaseResponse<{ item: Todolist }>>("/todo-lists", { title })
   },
   deleteTodolist(id: string) {
     return instance.delete<BaseResponse>(`/todo-lists/${id}`)
+  },
+  changeTodolistTitle(payload: { id: string; title: string }) {
+    const { id, title } = payload
+    return instance.put<BaseResponse>(`/todo-lists/${id}`, { title })
   },
 }
