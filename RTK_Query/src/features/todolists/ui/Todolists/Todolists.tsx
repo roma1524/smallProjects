@@ -4,7 +4,7 @@ import { TodolistItem } from "./TodolistItem/TodolistItem"
 import { useGetTodolistsQuery } from "@/features/todolists/api/_todolistsApi.ts"
 
 export const Todolists = () => {
-  const { data: todolists } = useGetTodolistsQuery()
+  const { data: todolists, refetch } = useGetTodolistsQuery()
 
   console.log(todolists)
 

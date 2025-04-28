@@ -14,6 +14,7 @@ export const todolistsApi = createApi({
       headers.set("Authorization", `Bearer ${localStorage.getItem(AUTH_TOKEN)}`)
     },
   }),
+  tagTypes: ["Todolist"],
   endpoints: (build) => ({
     getTodolists: build.query<DomainTask[], void>({
       query: () => "todo-lists",
@@ -22,6 +23,7 @@ export const todolistsApi = createApi({
           return { ...td, filter: "all", entityStatus: "idle" }
         })
       },
+      providesTags: ["Todolist"],
     }),
     createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
       query: (title) => {
@@ -31,6 +33,7 @@ export const todolistsApi = createApi({
           body: { title },
         }
       },
+      invalidatesTags: ["Todolist"],
     }),
     deleteTodolist: build.mutation<BaseResponse, string>({
       query: (id) => {
@@ -39,6 +42,7 @@ export const todolistsApi = createApi({
           url: `/todo-lists/${id}`,
         }
       },
+      invalidatesTags: ["Todolist"],
     }),
     changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
       query: ({ id, title }) => {
@@ -48,6 +52,7 @@ export const todolistsApi = createApi({
           body: { title },
         }
       },
+      invalidatesTags: ["Todolist"],
     }),
   }),
 })
