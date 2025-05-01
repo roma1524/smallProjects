@@ -1,8 +1,8 @@
-import { selectThemeMode } from "@/app/app-slice"
+import {selectThemeMode} from "@/app/app-slice"
 import {useAppDispatch, useAppSelector} from "@/common/hooks"
-import { getTheme } from "@/common/theme"
-import { type LoginInputs, loginSchema } from "@/features/auth/lib/schemas"
-import { zodResolver } from "@hookform/resolvers/zod"
+import {getTheme} from "@/common/theme"
+import {type LoginInputs, loginSchema} from "@/features/auth/lib/schemas"
+import {zodResolver} from "@hookform/resolvers/zod"
 import Button from "@mui/material/Button"
 import Checkbox from "@mui/material/Checkbox"
 import FormControl from "@mui/material/FormControl"
@@ -11,20 +11,16 @@ import FormGroup from "@mui/material/FormGroup"
 import FormLabel from "@mui/material/FormLabel"
 import Grid from "@mui/material/Grid2"
 import TextField from "@mui/material/TextField"
-import { Controller, type SubmitHandler, useForm } from "react-hook-form"
+import {Controller, type SubmitHandler, useForm} from "react-hook-form"
 import styles from "./Login.module.css"
-import {loginTC, selectIsLoggedIn} from "@/features/auth/model/auth-slice.ts";
-import {Navigate, useNavigate} from "react-router";
-import {Path} from "@/common/routing";
-import {useEffect} from "react";
+import {loginTC} from "@/features/auth/model/auth-slice.ts";
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const theme = getTheme(themeMode)
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
+
 
   const {
     register,
@@ -41,16 +37,6 @@ export const Login = () => {
     dispatch(loginTC(data))
     // reset()
   }
-
-  // if(isLoggedIn) {
-  //   return <Navigate to={Path.Main}/>
-  // }
-
- useEffect(() => {
-   if(isLoggedIn) {
-     navigate(Path.Main)
-   }
- }, [isLoggedIn])
 
   return (
     <Grid container justifyContent={"center"}>
