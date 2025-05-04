@@ -1,20 +1,21 @@
 import { CreateItemForm } from "@/common/components/CreateItemForm/CreateItemForm"
+import { useAppDispatch } from "@/common/hooks"
+import { createTodolistTC } from "@/features/todolists/model/todolists-slice"
 import { Todolists } from "@/features/todolists/ui/Todolists/Todolists"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid2"
-import { useCreateTodolistMutation } from "@/features/todolists/api/_todolistsApi.ts"
 
 export const Main = () => {
-  const [createTodolist] = useCreateTodolistMutation()
+  const dispatch = useAppDispatch()
 
-  const createTodolisHandler = (title: string) => {
-    createTodolist(title)
+  const createTodolist = (title: string) => {
+    dispatch(createTodolistTC(title))
   }
 
   return (
     <Container maxWidth={"lg"}>
       <Grid container sx={{ mb: "30px" }}>
-        <CreateItemForm onCreateItem={createTodolisHandler} />
+        <CreateItemForm onCreateItem={createTodolist} />
       </Grid>
       <Grid container spacing={4}>
         <Todolists />
