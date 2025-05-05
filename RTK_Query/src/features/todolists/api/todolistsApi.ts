@@ -5,6 +5,7 @@ import { BaseResponse } from "@/common/types"
 import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 
 export const todolistsApi = createApi({
+  tagTypes: ["TLists"],
   reducerPath: "todolistsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
@@ -18,6 +19,7 @@ export const todolistsApi = createApi({
       query: () => "todo-lists",
       transformResponse: (todoLists: Todolist[]): DomainTodolist[] =>
         todoLists.map((t) => ({ ...t, filter: "all", entityStatus: "idle" })),
+      providesTags: ["TLists"],
     }),
     createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
       query: (title) => ({
@@ -25,12 +27,14 @@ export const todolistsApi = createApi({
         method: "POST",
         body: { title },
       }),
+      invalidatesTags: ["TLists"],
     }),
     deleteTodolist: build.mutation<BaseResponse, string>({
       query: (id) => ({
         url: `/todo-lists/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["TLists"],
     }),
     changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
       query: ({ id, title }) => ({
@@ -38,6 +42,7 @@ export const todolistsApi = createApi({
         method: "PUT",
         body: { title },
       }),
+      invalidatesTags: ["TLists"],
     }),
   }),
 })
