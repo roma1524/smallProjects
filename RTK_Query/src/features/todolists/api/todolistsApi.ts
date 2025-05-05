@@ -1,25 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { AUTH_TOKEN } from "@/common/constants"
-import { instance } from "@/common/instance"
 import { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 import { BaseResponse } from "@/common/types"
 import { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
-
-export const _todolistsApi = {
-  getTodolists() {
-    return instance.get<Todolist[]>("/todo-lists")
-  },
-  changeTodolistTitle(payload: { id: string; title: string }) {
-    const { id, title } = payload
-    return instance.put<BaseResponse>(`/todo-lists/${id}`, { title })
-  },
-  createTodolist(title: string) {
-    return instance.post<BaseResponse<{ item: Todolist }>>("/todo-lists", { title })
-  },
-  deleteTodolist(id: string) {
-    return instance.delete<BaseResponse>(`/todo-lists/${id}`)
-  },
-}
 
 export const todolistsApi = createApi({
   reducerPath: "todolistsApi",
@@ -43,7 +26,25 @@ export const todolistsApi = createApi({
         body: { title },
       }),
     }),
+    deleteTodolist: build.mutation<BaseResponse, string>({
+      query: (id) => ({
+        url: `/todo-lists/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
+      query: ({ id, title }) => ({
+        url: `/todo-lists/${id}`,
+        method: "PUT",
+        body: { title },
+      }),
+    }),
   }),
 })
 
-export const { useGetTodolistsQuery, useCreateTodolistMutation } = todolistsApi
+export const {
+  useGetTodolistsQuery,
+  useCreateTodolistMutation,
+  useDeleteTodolistMutation,
+  useChangeTodolistTitleMutation,
+} = todolistsApi
