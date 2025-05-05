@@ -6,8 +6,6 @@ import { useGetTodolistsQuery } from "@/features/todolists/api/todolistsApi.ts"
 export const Todolists = () => {
   const { data: todoLists } = useGetTodolistsQuery()
 
-  console.log(todoLists)
-
   return (
     <>
       {todoLists?.map((todolist) => (
