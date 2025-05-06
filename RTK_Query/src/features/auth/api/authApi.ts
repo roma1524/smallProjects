@@ -1,8 +1,6 @@
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { LoginArgs } from "./authApi.types"
-import { BaseQueryArg, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { AUTH_TOKEN } from "@/common/constants"
 import { baseApi } from "@/app/baseApi.ts"
 
 export const _authApi = {

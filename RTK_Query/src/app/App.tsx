@@ -1,27 +1,33 @@
 import "./App.css"
-import { selectThemeMode } from "@/app/app-slice"
+import { selectThemeMode, setIsLoggedInAC } from "@/app/app-slice"
 import { ErrorSnackbar, Header } from "@/common/components"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { Routing } from "@/common/routing"
 import { getTheme } from "@/common/theme"
-import { initializeAppTC, selectIsInitialized } from "@/features/auth/model/auth-slice"
 import CircularProgress from "@mui/material/CircularProgress"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import styles from "./App.module.css"
+import { useMeQuery } from "@/features/auth/api/authApi.ts"
+import { ResultCode } from "@/common/enums"
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
-  const isInitialized = useAppSelector(selectIsInitialized)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const { data, isLoading } = useMeQuery()
 
   const dispatch = useAppDispatch()
 
   const theme = getTheme(themeMode)
 
   useEffect(() => {
-    dispatch(initializeAppTC())
-  }, [])
+    if (isLoading) return
+    setIsInitialized(true)
+    if (data?.resultCode === ResultCode.Success) {
+      dispatch(setIsLoggedInAC({ isLoggedIn: true }))
+    }
+  }, [data])
 
   if (!isInitialized) {
     return (

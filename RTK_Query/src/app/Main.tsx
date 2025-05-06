@@ -5,9 +5,7 @@ import Grid from "@mui/material/Grid2"
 import { useCreateTodolistMutation } from "@/features/todolists/api/todolistsApi.ts"
 
 export const Main = () => {
-  const [createTodolist, { isLoading }] = useCreateTodolistMutation()
-
-  console.log(isLoading)
+  const [createTodolist] = useCreateTodolistMutation()
 
   return (
     <Container maxWidth={"lg"}>
