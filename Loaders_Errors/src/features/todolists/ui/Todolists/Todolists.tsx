@@ -2,9 +2,12 @@ import { useGetTodolistsQuery } from "@/features/todolists/api/todolistsApi"
 import Grid from "@mui/material/Grid2"
 import Paper from "@mui/material/Paper"
 import { TodolistItem } from "./TodolistItem/TodolistItem"
+import { TodolistSkeleton } from "@/features/todolists/ui/Todolists/TodolistsSkeleton/TodolistsSkeleton.tsx"
 
 export const Todolists = () => {
-  const { data: todolists } = useGetTodolistsQuery()
+  const { data: todolists, isLoading } = useGetTodolistsQuery()
+
+  if (isLoading) return <TodolistSkeleton />
 
   return (
     <>
