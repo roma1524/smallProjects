@@ -34,7 +34,7 @@ export const Login = () => {
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "", rememberMe: false },
+    defaultValues: { email: "free@samuraijs.com", password: "free", rememberMe: false },
   })
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
