@@ -7,8 +7,8 @@ export const tasksApi = baseApi.injectEndpoints({
         endpoints: (build) => ({
             getTasks: build.query<GetTasksResponse, string>({
                 query: (todolistId) => `todo-lists/${todolistId}/tasks`,
-                providesTags: (result, _error, _arg, _meta) => {
-                return result ? result.items.map((task) => ({type: 'Task', id: task.id})) : ['Task']
+                providesTags: (result, _error, todolistId, _meta) => {
+                return result ? [...result.items.map((task) => ({type: 'Task', id: task.id } as const), {type: 'Task', id: todolistId},)] : ['Task']
             },
         }),
         addTask: build.mutation<BaseResponse<{ item: DomainTask }>, { todolistId: string; title: string }>({
@@ -17,7 +17,7 @@ export const tasksApi = baseApi.injectEndpoints({
                 method: "POST",
                 body: {title},
             }),
-            invalidatesTags: (_result, _error, arg, meta) => [{type: 'Task', id: arg.todolistId}],
+            invalidatesTags: (_result, _error,{todolistId} ) => [{type: 'Task', id: todolistId}],
         }),
         removeTask: build.mutation<BaseResponse, { todolistId: string; taskId: string }>({
             query: ({todolistId, taskId}) => ({
