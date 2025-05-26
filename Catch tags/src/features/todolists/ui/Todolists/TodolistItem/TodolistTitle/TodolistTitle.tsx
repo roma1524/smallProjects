@@ -1,11 +1,5 @@
 import {EditableSpan} from "@/common/components"
-import {useAppDispatch} from "@/common/hooks"
-import type {RequestStatus} from "@/common/types"
-import {
-    todolistsApi,
-    useRemoveTodolistMutation,
-    useUpdateTodolistTitleMutation,
-} from "@/features/todolists/api/todolistsApi"
+import {useRemoveTodolistMutation, useUpdateTodolistTitleMutation,} from "@/features/todolists/api/todolistsApi"
 import type {DomainTodolist} from "@/features/todolists/lib/types"
 import DeleteIcon from "@mui/icons-material/Delete"
 import IconButton from "@mui/material/IconButton"
@@ -21,32 +15,8 @@ export const TodolistTitle = ({todolist}: Props) => {
     const [removeTodolist] = useRemoveTodolistMutation()
     const [updateTodolistTitle] = useUpdateTodolistTitleMutation()
 
-    const dispatch = useAppDispatch()
-
-    // const changeTodolistStatus = (entityStatus: RequestStatus) => {
-    //
-    // }
-
-    const deleteTodolist = async () => {
-
-        const patchResult = dispatch(
-            todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
-                const todolist = state.find((todolist) => todolist.id === id)
-                if (todolist) {
-                    todolist.entityStatus = 'loading'
-                }
-            }),
-        )
-
-        try {
-            const res = await removeTodolist(id)
-            if (res.error) {
-                patchResult.undo()
-            }
-        } catch (e) {
-            patchResult.undo()
-        }
-
+    const deleteTodolist = () => {
+        removeTodolist(id)
     }
 
     const changeTodolistTitle = (title: string) => {
