@@ -3,7 +3,7 @@ import { AUTH_TOKEN } from "@/common/constants"
 import { ResultCode } from "@/common/enums"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { getTheme } from "@/common/theme"
-import { useLoginMutation } from "@/features/auth/api/authApi"
+import {useLoginMutation, useSecurityCaptchaQuery} from "@/features/auth/api/authApi"
 import { type Inputs, loginSchema } from "@/features/auth/lib/schemas"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Button from "@mui/material/Button"
@@ -16,10 +16,14 @@ import Grid from "@mui/material/Grid2"
 import TextField from "@mui/material/TextField"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
 import styles from "./Login.module.css"
+import {useState} from "react";
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
 
+  const [captchaImg, useCaptchaImg] = useState(null)
+
+  const {data : captchaUrl} = useSecurityCaptchaQuery()
   const [login] = useLoginMutation()
 
   const dispatch = useAppDispatch()
@@ -44,9 +48,13 @@ export const Login = () => {
         dispatch(setIsLoggedInAC({ isLoggedIn: true }))
         localStorage.setItem(AUTH_TOKEN, res.data.data.token)
         reset()
+      } else if (res.data?.resultCode === ResultCode.CaptchaError) {
+        useCaptchaImg(captchaUrl?.url)
       }
     })
   }
+
+  console.log(captchaImg?.url)
 
   return (
     <Grid container justifyContent={"center"}>
@@ -83,6 +91,7 @@ export const Login = () => {
               {...register("password")}
             />
             {errors.password && <span className={styles.errorMessage}>{errors.password.message}</span>}
+            {captchaImg && <><img src={captchaImg} alt={"captcha"}/></>}
             <FormControlLabel
               label={"Remember me"}
               control={
