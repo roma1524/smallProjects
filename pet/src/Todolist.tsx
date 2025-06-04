@@ -1,6 +1,6 @@
 import {FilterValuesType, TaskType} from './App';
-import {useState} from "react";
 import * as React from "react";
+import {useRef} from "react";
 
 type PropsType = {
     title: string,
@@ -22,11 +22,11 @@ export const Todolist = ({
                              addTask,
                          }: PropsType) => {
 
-    const [currentTitle, setCurrentTitle] = useState('');
+    let currentTitle = useRef('');
 
     const addTaskHandler = () => {
-        addTask(currentTitle)
-        setCurrentTitle('');
+        addTask(currentTitle.current)
+        currentTitle.current = '';
     }
 
     let tasksForTodolist = tasks
@@ -43,11 +43,11 @@ export const Todolist = ({
     const onCompletedClickHandler = () => changeFilter("completed");
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCurrentTitle((e.currentTarget.value).trim())
+        currentTitle.current = (e.currentTarget.value).trim()
     }
     const onKeyPressHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            addTask(currentTitle)
+            addTask(currentTitle.current)
         }
     }
 
@@ -61,7 +61,7 @@ export const Todolist = ({
             <button onClick={removeAllTaskHandler}>X</button>
         </div>
         <div>
-            <input value={currentTitle}
+            <input value={currentTitle.current}
                    onChange={onChangeHandler}
                    onKeyUp={onKeyPressHandler}
             />
