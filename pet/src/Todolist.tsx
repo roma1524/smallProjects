@@ -18,7 +18,6 @@ export const Todolist = ({
                              removeTask,
                              changeFilter,
                              removeAllTask,
-                             filter,
                              addTask,
                          }: PropsType) => {
 
@@ -29,14 +28,7 @@ export const Todolist = ({
         currentTitle.current = '';
     }
 
-    let tasksForTodolist = tasks
-    if (filter === "all") {
-        tasksForTodolist = tasks
-    } else if (filter === "active") {
-        tasksForTodolist = tasks.filter(t => !!t.isDone)
-    } else if (filter === "completed") {
-        tasksForTodolist = tasks.filter(t => !t.isDone)
-    }
+
 
     const onAllClickHandler = () => changeFilter("all");
     const onActiveClickHandler = () => changeFilter("active");
@@ -69,7 +61,7 @@ export const Todolist = ({
         </div>
         <ul>
             {
-                tasksForTodolist.length > 0 ? tasksForTodolist.map(t => <li key={t.id}>
+                tasks.length > 0 ? tasks.map(t => <li key={t.id}>
                         <input type="checkbox" checked={t.isDone}/>
                         <span>{t.title}</span>
                         <button onClick={() => {

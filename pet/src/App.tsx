@@ -39,10 +39,31 @@ export const App = () => {
         setTasks([newTask, ...tasks])
     }
 
+
+    let filteredTask = [];
+
+
+    const getFilteredTasks = () => {
+        let tasksForTodolist = tasks;
+
+        if (filter === "all") {
+            tasksForTodolist = tasks
+        }
+        if (filter === "active") {
+            tasksForTodolist = tasks.filter(t => !!t.isDone)
+        }
+        if (filter === "completed") {
+            tasksForTodolist = tasks.filter(t => !t.isDone)
+        }
+        return tasksForTodolist;
+    }
+
+    filteredTask = getFilteredTasks()
+
     return (
         <div className="App">
             <Todolist title="What to learn"
-                      tasks={tasks}
+                      tasks={filteredTask}
                       filter={filter}
                       removeTask={removeTask}
                       changeFilter={changeFilter}
