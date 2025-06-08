@@ -65,6 +65,9 @@ export const App = () => {
         const newTask = {id: v1(), title, isDone: false}
         setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
     }
+    const isChecked = (todolistId: string, taskId: string, cheked: boolean) => {
+
+    }
 
     return (
         <div className="App">
@@ -90,6 +93,7 @@ export const App = () => {
                               changeFilter={changeFilter}
                               addTask={addTask}
                               removeAllTask={removeAllTask}
+                              isChecked={isChecked}
                     />
                 )
             })}
