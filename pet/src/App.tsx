@@ -65,8 +65,11 @@ export const App = () => {
         const newTask = {id: v1(), title, isDone: false}
         setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
     }
-    const isChecked = (todolistId: string, taskId: string, cheked: boolean) => {
-
+    const changeStatus = (todolistId: string, taskId: string, ischeked: boolean) => {
+        setTasks(prevState => ({
+            ...prevState,
+            [todolistId]: prevState[todolistId].map(t => t.id === taskId ? {...t, isDone: ischeked}: t)})
+        )
     }
 
     return (
@@ -93,7 +96,7 @@ export const App = () => {
                               changeFilter={changeFilter}
                               addTask={addTask}
                               removeAllTask={removeAllTask}
-                              isChecked={isChecked}
+                              changeStatus={changeStatus}
                     />
                 )
             })}

@@ -10,7 +10,7 @@ type PropsType = {
     changeFilter: (todolistId: string, value: FilterValuesType) => void
     addTask: (todolistId: string, title: string) => void
     removeAllTask: (todolistId: string) => void
-    isChecked: (todolistId: string, taskId: string, checked: boolean) => void
+    changeStatus: (todolistId: string, taskId: string, checked: boolean) => void
 }
 
 export const Todolist = ({
@@ -21,7 +21,7 @@ export const Todolist = ({
                              changeFilter,
                              removeAllTask,
                              addTask,
-                             isChecked
+                             changeStatus
                          }: PropsType) => {
 
     const addTaskHandler = (title: string) => {
@@ -32,9 +32,7 @@ export const Todolist = ({
     const onActiveClickHandler = () => changeFilter(tdId, "active");
     const onCompletedClickHandler = () => changeFilter(tdId, "completed");
 
-const isCheckedHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    // isChecked(tdId, tasksId, e.currentTarget.checked)
-}
+
 
     return (
         <div style={{display: 'flex', gap: '50px'}}>
@@ -47,6 +45,11 @@ const isCheckedHandler = (e: ChangeEvent<HTMLInputElement>) => {
                 <ul>
                     {
                        tasks.length > 0 ? tasks.map((t, idx) => {
+
+                           const isCheckedHandler = (e: ChangeEvent<HTMLInputElement>) => {
+                               changeStatus(tdId, t.id, e.currentTarget.checked)
+                           }
+
                             return (
                                 <li key={idx}>
                                     <input type="checkbox" checked={t.isDone} onChange={isCheckedHandler} />
