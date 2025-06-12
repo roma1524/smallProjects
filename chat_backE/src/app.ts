@@ -4,7 +4,7 @@ import express, { Request, Response } from 'express';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
+const socket = new Server(server, {
   cors: {
     origin: "*", // Настройте правильно для production
     methods: ["GET", "POST"]
@@ -21,8 +21,8 @@ interface Message {
 }
 
 const messages: Message[] = [
-  {message: 'Hello Ivan', id: '323223', user: {id: 'ds32323', name: 'Roman'}},
-  {message: 'Hello Roman', id: '44444', user: {id: 'ds11111', name: 'Ivan'}}
+  {message: 'Hello Ivan', id: new Date().getTime().toString(), user: {id: new Date().getTime().toString(), name: 'Roman'}},
+  {message: 'Hello Roman', id: new Date().getTime().toString(), user: {id: new Date().getTime().toString(), name: 'Ivan'}}
 ];
 
 const PORT = process.env.PORT || 5115
@@ -31,14 +31,36 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello WB');
 })
 
-io.on('connection', (socket) => {
+const users = new Map()
 
-  socket.on('client-message-sent', (message) => {
-    console.log(message);
+socket.on('connection', (socketChanel) => {
+
+  users.set(socketChanel, {id: new Date().getTime().toString(), name: 'anonym'})
+
+  socket.on('disconnect', () => {
+    users.delete(socketChanel)
+  })
+
+  socketChanel.on('client-name', (name: string) => {
+    const user = users.get(socketChanel)
+    user.name = name
+  })
+
+  socketChanel.on('client-message-sent', (message: string) => {
+    if (typeof message !== 'string') {
+      return;
+    }
+
+    const user = users.get(socketChanel)
+
+    let messageItem = {message, id: new Date().getTime().toString(), user: {id: user.id, name: user.name}}
+    messages.push(messageItem)
+
+    socketChanel.emit('new-message-sent', messageItem)
     
   })
 
-  socket.emit('init-mess', messages)
+  socketChanel.emit('init-mess', messages)
 
   console.log('Новое подключение: ');
 })

@@ -1,20 +1,38 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import './App.css'
 import {io} from "socket.io-client";
+
+type Message = {
+    message: string;
+    id: string;
+    user: {
+        id: string;
+        name: string;
+    };
+}
 
 const socket = io('http://localhost:5115');
 
 function App() {
 
-    const [messages, setMessages] = useState<Array<any>>([])
-
-    const [message, setMessage] = useState('Hello')
-
     useEffect(() => {
-        socket.on('init-mess', (messages: any) => {
+        socket.on('init-mess', (messages: Message[]) => {
             setMessages(messages)
         })
+        socket.on('new-message-sent', (messageItem: Message) => {
+            setMessages(prevState => [...prevState, messageItem])
+        })
     }, [])
+
+    const [messages, setMessages] = useState<Message[]>([])
+    const [message, setMessage] = useState('Hello')
+    const [name, setName] = useState('')
+
+    useEffect(() => {
+        messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+    }, [messages]);
+
+    const messagesAnchorRef = useRef<HTMLDivElement>(null)
 
     return (
         <div className='App'>
@@ -28,7 +46,13 @@ function App() {
                             </div>
                         )
                     })}
+                    <div ref={messagesAnchorRef}></div>
                 </div>
+                <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
+                <button onClick={() => {
+                    socket.emit('client-name', name)
+                }}>Send Name
+                </button>
                 <textarea value={message} onChange={(e) => setMessage(e.currentTarget.value)}></textarea>
                 <button onClick={() => {
                     socket.emit('client-message-sent', message)
