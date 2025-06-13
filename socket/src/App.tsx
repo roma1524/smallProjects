@@ -21,6 +21,7 @@ function App() {
     const [name, setName] = useState('')
     const messagesAnchorRef = useRef<HTMLDivElement>(null)
     const [autoScrollActive, setAutoScrollActive] = useState(true)
+    const [lastScrollTop, setLastScrollTop] = useState(0)
 
     useEffect(() => {
         const handleInitMessages = (messages: Message[]) => {
@@ -39,12 +40,6 @@ function App() {
             socket.off('new-message-sent', handleNewMessage);
         };
 
-        // socket.on('init-mess', (messages: Message[]) => {
-        //     setMessages(messages)
-        // })
-        // socket.on('new-message-sent', (messageItem: Message) => {
-        //     setMessages(prevState => [...prevState, messageItem])
-        // })
     }, [])
 
     useEffect(() => {
@@ -57,21 +52,29 @@ function App() {
             setMessage('');
         }
     };
-
     const handleSetName = () => {
         if (name.trim()) {
             socket.emit('client-name', name.trim());
         }
     };
 
+    const handleSetAutoScroll = (e) => {
+        const element = e.currentTarget;
+        const maxScrollPosition = element.scrollHeight - element.clientHeight;
+
+            if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
+                setAutoScrollActive(true)
+            } else {
+                setAutoScrollActive(false)
+            }
+            setLastScrollTop(element.scrollTop)
+    }
+
     return (
         <div className='App'>
             <div>
                 <div style={{border: '1px solid black', padding: '10px', height: '300px', overflowY: 'scroll'}}
-                onScroll={() => {
-                    
-                }}
-                >
+                     onScroll={handleSetAutoScroll}>
                     {messages?.map((item) => {
                         return (
                             <div key={v1()}>
@@ -88,7 +91,7 @@ function App() {
                 <textarea value={message} onChange={
                     (e) => setMessage(e.currentTarget.value)
                 }
-                placeholder='Message'
+                          placeholder='Message'
                 ></textarea>
                 <button onClick={handleSendMessage}>Send
                 </button>
