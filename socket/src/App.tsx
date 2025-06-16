@@ -1,7 +1,10 @@
 import {useEffect, useRef, useState} from 'react'
 import './App.css'
-import {io} from "socket.io-client";
+
 import {v1} from "uuid";
+import {applyMiddleware, combineReducers, createStore} from "redux";
+import {chatReducer} from "./chat-reducer.ts";
+import thunk from "redux-thunk";
 
 type Message = {
     message: string;
@@ -12,7 +15,9 @@ type Message = {
     };
 }
 
-const socket = io('http://localhost:5115');
+const store = createStore(combineReducers({chat: chatReducer}), applyMiddleware(thunk));
+
+
 
 function App() {
 
@@ -22,6 +27,7 @@ function App() {
     const messagesAnchorRef = useRef<HTMLDivElement>(null)
     const [autoScrollActive, setAutoScrollActive] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
+
 
     useEffect(() => {
         const handleInitMessages = (messages: Message[]) => {
