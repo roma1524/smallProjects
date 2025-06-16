@@ -43,7 +43,9 @@ function App() {
     }, [])
 
     useEffect(() => {
-        messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+       if(autoScrollActive) {
+           messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+       }
     }, [messages]);
 
     const handleSendMessage = () => {
@@ -58,23 +60,21 @@ function App() {
         }
     };
 
-    const handleSetAutoScroll = (e) => {
-        const element = e.currentTarget;
-        const maxScrollPosition = element.scrollHeight - element.clientHeight;
-
-            if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
-                setAutoScrollActive(true)
-            } else {
-                setAutoScrollActive(false)
-            }
-            setLastScrollTop(element.scrollTop)
-    }
-
     return (
         <div className='App'>
             <div>
                 <div style={{border: '1px solid black', padding: '10px', height: '300px', overflowY: 'scroll'}}
-                     onScroll={handleSetAutoScroll}>
+                     onScroll={(e) => {
+                         const element = e.currentTarget;
+                         const maxScrollPosition = element.scrollHeight - element.clientHeight;
+
+                         if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
+                             setAutoScrollActive(true)
+                         } else {
+                             setAutoScrollActive(false)
+                         }
+                         setLastScrollTop(element.scrollTop)
+                     }}>
                     {messages?.map((item) => {
                         return (
                             <div key={v1()}>
