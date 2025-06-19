@@ -2,15 +2,9 @@ import {useEffect, useRef, useState} from 'react'
 import './App.css'
 
 import {v1} from "uuid";
-import {applyMiddleware, combineReducers, createStore} from "redux";
-import {chatReducer, createConnection, deleteConnection, setClientName, setNewMessage} from "./chat-reducer.ts";
-import {thunk} from "redux-thunk";
+import {createConnection, deleteConnection, setClientName, setNewMessage, typingMessage} from "./chat-reducer.ts";
 import {useDispatch, useSelector} from "react-redux";
-
-
-const rootReducer = combineReducers({chat: chatReducer})
-type AppStateType = ReturnType<typeof rootReducer>
-export const store = createStore(rootReducer, applyMiddleware(thunk));
+import type {AppStateType} from "./main.tsx";
 
 
 function App() {
@@ -22,6 +16,7 @@ function App() {
     const [lastScrollTop, setLastScrollTop] = useState(0)
 
     const messages = useSelector((state: AppStateType) => state.chat.messages)
+    const typingUser = useSelector((state: AppStateType) => state.chat.typingUsers)
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -57,26 +52,38 @@ function App() {
                          }}>
                         {messages?.map((item) => {
                             return (
-                                <div key={v1()}>
+                                <div key={item.id}>
                                     <b>{item.user.name}:</b> {item.message}
                                     <hr/>
+                                </div>
+                            )
+                        })}
+                        {typingUser?.map((item) => {
+                            return (
+                                <div key={item.id}>
+                                    <span>{item.name} ...</span>
                                 </div>
                             )
                         })}
                         <div ref={messagesAnchorRef}></div>
                     </div>
                     <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
-                    <button onClick={() => {
+                    <button
+                        onClick={() => {
                         dispatch(setClientName(name))
                     }}>Send Name
                     </button>
                     <textarea value={message} onChange={
                         (e) => setMessage(e.currentTarget.value)
                     }
+                              onKeyPress={() => {
+                                  dispatch(typingMessage())
+                              }}
                               placeholder='Message'
                     ></textarea>
                     <button onClick={() => {
                         dispatch(setNewMessage(message))
+                        setMessage('')
                     }}>Send
                     </button>
                 </div>

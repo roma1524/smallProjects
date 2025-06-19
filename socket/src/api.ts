@@ -11,16 +11,21 @@ export const api = {
         });
     },
     subscribe:(initMessagesHandler: (messages: Message[]) => void,
-              newMessageHandler: (message: Message) => void
+              newMessageHandler: (message: Message) => void,
+              userTypingHandler: (user: string) => void
     ) => {
         api.socket?.on('init-mess', initMessagesHandler);
         api.socket?.on('new-message-sent', newMessageHandler);
+        api.socket?.on('user-typing', userTypingHandler)
     },
     sendName:(name: string) => {
         api.socket?.emit('client-name', name.trim())
     },
     sendMessage:(message: string) => {
         api.socket?.emit('client-message-sent', message.trim())
+    },
+    typingMessage: () => {
+        api.socket?.emit('typing-new-message')
     },
     unsubscribe:() => {
         api.socket?.off('init-mess');
