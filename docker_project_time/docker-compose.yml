@@ -4,11 +4,17 @@ services:
   frontend:
     build: ./frontend
     restart: always
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
     ports:
       - '3000:3000'
   api:
     build: ./api
     restart: always
+    volumes:
+      - /app/node_modules
+      - ./api:/app
     ports:
       - '5555:5000'
     depends_on:
@@ -17,6 +23,8 @@ services:
   mysql:
     image: mysql
     restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: time_db
@@ -28,4 +36,6 @@ services:
     image: adminer
     restart: always
     ports:
-      - '8888:8888'
+      - '8888:8080'
+volumes:
+  mysql_data:
