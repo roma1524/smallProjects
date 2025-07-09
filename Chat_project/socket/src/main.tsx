@@ -9,6 +9,7 @@ import {thunk} from "redux-thunk";
 
 const rootReducer = combineReducers({chat: chatReducer})
 export type AppStateType = ReturnType<typeof rootReducer>
+// @ts-ignore
 export const store = createStore(rootReducer, applyMiddleware(thunk));
 
 createRoot(document.getElementById('root')!).render(

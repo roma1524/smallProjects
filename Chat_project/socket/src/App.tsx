@@ -1,14 +1,11 @@
 import {useEffect, useRef, useState} from 'react'
 import './App.css'
-
-import {v1} from "uuid";
 import {createConnection, deleteConnection, setClientName, setNewMessage, typingMessage} from "./chat-reducer.ts";
 import {useDispatch, useSelector} from "react-redux";
 import type {AppStateType} from "./main.tsx";
-
+import { ThunkDispatch } from 'redux-thunk';
 
 function App() {
-
     const [message, setMessage] = useState('')
     const [name, setName] = useState('')
     const messagesAnchorRef = useRef<HTMLDivElement>(null)
@@ -16,79 +13,103 @@ function App() {
     const [lastScrollTop, setLastScrollTop] = useState(0)
 
     const messages = useSelector((state: AppStateType) => state.chat.messages)
-    const typingUser = useSelector((state: AppStateType) => state.chat.typingUsers)
-    const dispatch = useDispatch()
+    const typingUsers = useSelector((state: AppStateType) => state.chat.typingUsers)
+    const dispatch = useDispatch<ThunkDispatch<AppStateType, void, any>>()
 
     useEffect(() => {
-        dispatch(createConnection())
-
+        let isMounted = true;
+        if (isMounted) {
+            dispatch(createConnection())
+        }
         return () => {
+            isMounted = false;
             dispatch(deleteConnection())
         }
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
-        if (autoScrollActive) {
-            messagesAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+        if (autoScrollActive && messagesAnchorRef.current) {
+            messagesAnchorRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
         }
-    }, [messages]);
+    }, [messages, autoScrollActive]);
 
+    const handleSendMessage = () => {
+        if (message.trim()) {
+            dispatch(setNewMessage(message.trim()))
+            setMessage('')
+        }
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        } else {
+            dispatch(typingMessage())
+        }
+    }
 
     return (
-
-            <div className='App'>
-                <div>
-                    <div style={{border: '1px solid black', padding: '10px', height: '300px', overflowY: 'scroll'}}
-                         onScroll={(e) => {
-                             const element = e.currentTarget;
-                             const maxScrollPosition = element.scrollHeight - element.clientHeight;
-
-                             if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
-                                 setAutoScrollActive(true)
-                             } else {
-                                 setAutoScrollActive(false)
-                             }
-                             setLastScrollTop(element.scrollTop)
-                         }}>
-                        {messages?.map((item) => {
-                            return (
-                                <div key={item.id}>
-                                    <b>{item.user.name}:</b> {item.message}
-                                    <hr/>
-                                </div>
-                            )
-                        })}
-                        {typingUser?.map((item) => {
-                            return (
-                                <div key={item.id}>
-                                    <span>{item.name} ...</span>
-                                </div>
-                            )
-                        })}
-                        <div ref={messagesAnchorRef}></div>
-                    </div>
-                    <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
-                    <button
-                        onClick={() => {
-                        dispatch(setClientName(name))
-                    }}>Send Name
-                    </button>
-                    <textarea value={message} onChange={
-                        (e) => setMessage(e.currentTarget.value)
-                    }
-                              onKeyPress={() => {
-                                  dispatch(typingMessage())
-                              }}
-                              placeholder='Message'
-                    ></textarea>
-                    <button onClick={() => {
-                        dispatch(setNewMessage(message))
-                        setMessage('')
-                    }}>Send
-                    </button>
+        <div className='App'>
+            <div>
+                <div className="chat-container"
+                     onScroll={(e) => {
+                         const element = e.currentTarget;
+                         const maxScrollPosition = element.scrollHeight - element.clientHeight;
+                         setAutoScrollActive(
+                             element.scrollTop > lastScrollTop &&
+                             Math.abs(maxScrollPosition - element.scrollTop) < 10
+                         );
+                         setLastScrollTop(element.scrollTop);
+                     }}>
+                    {messages?.map((item) => (
+                        <div key={item.id}>
+                            <b>{item.user.name}:</b> {item.message}
+                            <hr/>
+                        </div>
+                    ))}
+                    {typingUsers?.map((user) => (
+                        <div key={user.id}>
+                            <span>{user.name} is typing...</span>
+                        </div>
+                    ))}
+                    <div ref={messagesAnchorRef} />
                 </div>
-            </div>
 
+                <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your name"
+                />
+                <button
+                    onClick={() => {
+                        if (name.trim()) {
+                            dispatch(setClientName(name.trim()))
+                        }
+                    }}
+                    disabled={!name.trim()}
+                >
+                    Set Name
+                </button>
+
+                <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type your message"
+                />
+
+                <button
+                    onClick={handleSendMessage}
+                    disabled={!message.trim()}
+                >
+                    Send
+                </button>
+            </div>
+        </div>
     )
 }
 

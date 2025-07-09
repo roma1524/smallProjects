@@ -1,7 +1,11 @@
-FROM node:alpine
-WORKDIR /app
-EXPOSE 5000
-COPY package*.json ./
-RUN npm install
-COPY . ./
-CMD ["npm", "run", "start"]
+#FROM node:alpine
+#WORKDIR /app
+#COPY package*.json ./
+#COPY ./src ./src
+#COPY ./public ./public
+#RUN npm install \
+#     && npm install -g serve \
+#    && npm run build \
+#    && rm -fr node_modules
+#EXPOSE 3000
+#CMD ["serve", "-s", "build"]
